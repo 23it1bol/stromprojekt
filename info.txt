@@ -1,0 +1,38 @@
+GET /api/kunden → Liste aller Kunden
+
+POST /api/kunden → Neuen Kunden anlegen
+
+GET /api/rechnungen/:id → Einzelne Rechnung abrufen
+
+POST /api/anlage/:id/wartung → Wartung eintragen
+
+src -> source
+
+Ordner models/
+Enthält Definitionen für die Datenstrukturen (Tabellen).
+Beispiel: Kunde.ts, Zaehler.ts, Verbrauch.ts
+Warum:
+Typen/Interfaces stellen sicher, dass die Daten korrekt verwendet werden
+Später kann man diese direkt für DB-Queries, Controller oder Validierungen verwenden
+
+
+Ordner controllers/
+Enthält die Logik für jede Ressource
+Beispiel: kundenController.ts
+Warum:
+Trennt “was passiert mit den Daten” von “wie die Daten empfangen werden”
+Hilft bei sauberem, prüfungsfreundlichem Aufbau
+
+Ordner utils/
+Für Hilfsfunktionen, die in mehreren Dateien benutzt werden
+Beispiel: auditLogger.ts
+Warum:
+Code nicht mehrfach schreiben, sauber wiederverwenden
+Prüferfreundlich: du kannst klar erklären, Audit-Log ist zentral
+
+src = alles, was programmiert wird
+models = Definitionen der Daten
+controllers = Logik, was mit den Daten passiert
+routes = REST-Endpunkte für Frontend/Client
+utils = Hilfsfunktionen wie Audit-Logger
+index.ts = Startpunkt des Servers
