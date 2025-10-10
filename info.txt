@@ -36,3 +36,36 @@ controllers = Logik, was mit den Daten passiert
 routes = REST-Endpunkte für Frontend/Client
 utils = Hilfsfunktionen wie Audit-Logger
 index.ts = Startpunkt des Servers
+
+target: "ES2020" → sagt TypeScript, dass der Output JavaScript für die ES2020-Version sein soll.
+
+module: "CommonJS" → Node.js verwendet CommonJS-Module (require/exports).
+
+moduleResolution: "node" → sagt TypeScript, wie es Module finden soll.
+
+outDir: "dist" → kompilierte JS-Dateien werden dort abgelegt, wenn du tsc ausführst.
+
+rootDir: "src" → Quellcode liegt im src/ Ordner.
+
+strict: true → strenge Typprüfung, gut für Anfänger, Fehler werden früher erkannt.
+
+esModuleInterop: true → erlaubt, Default-Importe wie import express from "express" zu nutzen, auch wenn das Original CommonJS ist.
+
+import express from "express";
+→ Lädt das Express-Modul, um Webserver-Funktionen zu nutzen.
+
+const app = express();
+→ Erstellt eine Instanz des Express-Servers.
+
+const port = 3000;
+→ Port, auf dem der Server läuft. Standard ist oft 3000.
+
+app.get("/test", (req, res) => res.send("OK"));
+→ Erstellt eine Route, also eine URL, die reagiert.
+
+/test → Pfad, den der Browser oder Postman aufruft
+
+(req, res) => res.send("OK") → Callback-Funktion, die "OK" zurückgibt
+
+app.listen(port, () => { console.log(...); });
+→ Startet den Server und zeigt in der Konsole an, dass er läuft.
