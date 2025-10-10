@@ -7,8 +7,9 @@
 
 -- Kunden-Tabelle
 CREATE TABLE Kunden (
-    KundenID SERIAL PRIMARY KEY,
-    Name VARCHAR(100) NOT NULL,
+    KundenID INT AUTO_INCREMENT PRIMARY KEY,
+    Vorname VARCHAR(50) NOT NULL,
+    Nachname VARCHAR(50) NOT NULL,
     Straße VARCHAR(100),
     Hausnummer VARCHAR(10),
     Mobilnummer VARCHAR(20),
@@ -29,12 +30,13 @@ CREATE TABLE Verbrauchsdaten (
     Datum DATE NOT NULL,
     Zaehlerstand INT NOT NULL,
     PRIMARY KEY (Zaehlernummer, Datum),
+-- die Kombination aus Zaehlernummer + Datum ein PRIMARY KEY
     FOREIGN KEY (Zaehlernummer) REFERENCES Zaehler(Zaehlernummer)
 );
 
 -- Anlagen-Tabelle
 CREATE TABLE Anlagen (
-    AnlageID SERIAL PRIMARY KEY,
+    AnlageID INT PRIMARY KEY,
     Name VARCHAR(100) NOT NULL,
     Typ VARCHAR(50),
     Inbetriebnahmedatum DATE,
@@ -44,7 +46,7 @@ CREATE TABLE Anlagen (
 
 -- Wartungen-Tabelle
 CREATE TABLE Wartungen (
-    WartungID SERIAL PRIMARY KEY,
+    WartungID INT PRIMARY KEY,
     AnlageID INT NOT NULL,
     Wartungsdatum DATE NOT NULL,
     Beschreibung TEXT,
@@ -54,11 +56,11 @@ CREATE TABLE Wartungen (
 
 -- Änderungsprotokoll (für GoBD / Audit Trail)
 CREATE TABLE Audit_Log (
-    LogID SERIAL PRIMARY KEY,
+    LogID INT PRIMARY KEY,
     Tabelle VARCHAR(50),
     DatensatzID INT,
     Aktion VARCHAR(10), -- z. B. 'INSERT', 'UPDATE', 'DELETE'
-    Änderungsdatum TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    Aenderungsdatum TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     Benutzer VARCHAR(50),
     Bemerkung TEXT
 );

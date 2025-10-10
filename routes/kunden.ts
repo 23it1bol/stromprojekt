@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAllKunden, createKunde } from '../controllers/kundenController';
+import { getAllKunden, createKunde } from '../controllers/kundenController.ts';
 import { logAudit } from '../utils/auditLogger';
 
 const router = express.Router(); // Erstellt einen Router für diese Gruppe von Endpunkten

@@ -1,0 +1,8 @@
+{
+  "name": "mein-projekt",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "scripts": {
+    "dev": "ts-node src/index.ts"
+  }
+}
