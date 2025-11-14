@@ -4,10 +4,19 @@
     "module": "CommonJS",
     "moduleResolution": "node",
     "outDir": "dist",
-    "rootDir": "src",
+    "rootDir": ".",
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src"]
+  "include": [
+    "src",
+    "controllers",
+    "routes",
+    "models",
+    "utils",
+    "middleware",
+    "scripts"
+  ],
+  "exclude": ["node_modules", "dist", "tmp_uploads"]
 }

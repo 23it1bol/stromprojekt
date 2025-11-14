@@ -8,11 +8,35 @@ import express from "express";
 // MySQL-Pool importieren, der die Verbindung zur Datenbank verwaltet
 import pool from "./db";
 
+// Router importieren
+import kundenRoutes from '../routes/kunden';
+import importRoutes from '../routes/import';
+import authRoutes from '../routes/auth';
+import logsRoutes from '../routes/logs';
+import devicesRoutes from '../routes/devices';
+
 // Express-Anwendung erstellen
 const app = express();
 
+// Middleware für JSON-Parsing aktivieren
+app.use(express.json());
+
 // Port festlegen, auf dem der Server später läuft
 const port = 3000;
+
+// -----------------------------
+// Routen einbinden
+// -----------------------------
+// Kunden-Routen unter /api/kunden verfügbar machen
+app.use('/api/kunden', kundenRoutes);
+// Import-Routen unter /api/import verfügbar machen
+app.use('/api/import', importRoutes);
+// Auth-Routen unter /api/auth verfügbar machen
+app.use('/api/auth', authRoutes);
+// Logs-Routen unter /api/logs verfügbar machen
+app.use('/api/logs', logsRoutes);
+// Devices-Routen unter /api/devices verfügbar machen
+app.use('/api/devices', devicesRoutes);
 
 // -----------------------------
 // Test-Route für Funktionsprüfung
