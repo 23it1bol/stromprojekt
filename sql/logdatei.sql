@@ -174,97 +174,53 @@ BEGIN
     );
 END$$
 
+
 -- ======================
--- Anlagen-Tabelle Trigger
+-- Users-Tabelle Trigger (für Änderungen an Benutzerkonten)
 -- ======================
 
-CREATE TRIGGER trg_anlagen_insert
-AFTER INSERT ON Anlagen
+CREATE TRIGGER trg_users_insert
+AFTER INSERT ON users
 FOR EACH ROW
 BEGIN
     INSERT INTO Audit_Log (Tabelle, DatensatzID, Aktion, Benutzer, Bemerkung)
     VALUES (
-        'Anlagen',
-        NEW.AnlageID,
+        'users',
+        NEW.id,
         'INSERT',
         CURRENT_USER(),
-        CONCAT('Neue Anlage: Name = ', NEW.Name, ', Typ = ', NEW.Typ, ', Status = ', NEW.Status)
+        CONCAT('Neuer Benutzer: id = ', NEW.id, ', email = ', NEW.email, ', name = ', IFNULL(NEW.name, ''))
     );
 END$$
 
-CREATE TRIGGER trg_anlagen_update
-AFTER UPDATE ON Anlagen
+CREATE TRIGGER trg_users_update
+AFTER UPDATE ON users
 FOR EACH ROW
 BEGIN
     INSERT INTO Audit_Log (Tabelle, DatensatzID, Aktion, Benutzer, Bemerkung)
     VALUES (
-        'Anlagen',
-        NEW.AnlageID,
+        'users',
+        NEW.id,
         'UPDATE',
         CURRENT_USER(),
-        CONCAT('Anlage aktualisiert: Status ', OLD.Status, ' -> ', NEW.Status)
+        CONCAT('Benutzer aktualisiert: id = ', NEW.id, ', email ', OLD.email, ' -> ', NEW.email, ', name ', IFNULL(OLD.name,''), ' -> ', IFNULL(NEW.name,''))
     );
 END$$
 
-CREATE TRIGGER trg_anlagen_delete
-AFTER DELETE ON Anlagen
+CREATE TRIGGER trg_users_delete
+AFTER DELETE ON users
 FOR EACH ROW
 BEGIN
     INSERT INTO Audit_Log (Tabelle, DatensatzID, Aktion, Benutzer, Bemerkung)
     VALUES (
-        'Anlagen',
-        OLD.AnlageID,
+        'users',
+        OLD.id,
         'DELETE',
         CURRENT_USER(),
-        CONCAT('Anlage gelöscht: Name = ', OLD.Name)
+        CONCAT('Benutzer gelöscht: id = ', OLD.id, ', email = ', OLD.email)
     );
 END$$
 
--- ======================
--- Wartungen-Tabelle Trigger
--- ======================
-
-CREATE TRIGGER trg_wartungen_insert
-AFTER INSERT ON Wartungen
-FOR EACH ROW
-BEGIN
-    INSERT INTO Audit_Log (Tabelle, DatensatzID, Aktion, Benutzer, Bemerkung)
-    VALUES (
-        'Wartungen',
-        NEW.WartungID,
-        'INSERT',
-        CURRENT_USER(),
-        CONCAT('Neue Wartung für AnlageID ', NEW.AnlageID, ' am ', NEW.Wartungsdatum, ', Typ = ', NEW.Wartungstyp)
-    );
-END$$
-
-CREATE TRIGGER trg_wartungen_update
-AFTER UPDATE ON Wartungen
-FOR EACH ROW
-BEGIN
-    INSERT INTO Audit_Log (Tabelle, DatensatzID, Aktion, Benutzer, Bemerkung)
-    VALUES (
-        'Wartungen',
-        NEW.WartungID,
-        'UPDATE',
-        CURRENT_USER(),
-        CONCAT('Wartung aktualisiert: Beschreibung ', OLD.Beschreibung, ' -> ', NEW.Beschreibung)
-    );
-END$$
-
-CREATE TRIGGER trg_wartungen_delete
-AFTER DELETE ON Wartungen
-FOR EACH ROW
-BEGIN
-    INSERT INTO Audit_Log (Tabelle, DatensatzID, Aktion, Benutzer, Bemerkung)
-    VALUES (
-        'Wartungen',
-        OLD.WartungID,
-        'DELETE',
-        CURRENT_USER(),
-        CONCAT('Wartung gelöscht: AnlageID = ', OLD.AnlageID, ', Datum = ', OLD.Wartungsdatum)
-    );
-END$$
 
 -- ======================
 -- 3. Delimiter zurücksetzen

@@ -1,0 +1,231 @@
+﻿{
+  "info": {
+    "name": "Oberstufe API - Collection",
+    "_postman_id": "b6f4e4c1-0000-4000-8000-000000000000",
+    "description": "Postman collection für die im Projekt vorhandenen Endpunkte",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health - Test",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/test", "host": ["{{baseUrl}}"], "path": ["test"] }
+      }
+    },
+    {
+      "name": "DB Test",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/dbtest", "host": ["{{baseUrl}}"], "path": ["dbtest"] }
+      }
+    },
+    {
+      "name": "Kunden - Get All",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": { "raw": "{{baseUrl}}/api/kunden", "host": ["{{baseUrl}}"], "path": ["api", "kunden"] }
+      }
+    },
+    {
+      "name": "Kunden - Get By Id",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": { "raw": "{{baseUrl}}/api/kunden/{{kundeId}}", "host": ["{{baseUrl}}"], "path": ["api", "kunden", "{{kundeId}}"] }
+      }
+    },
+    {
+      "name": "Kunden - Create",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"Vorname\": \"Max\",\n  \"Nachname\": \"Mustermann\",\n  \"Straße\": \"Hauptstraße\",\n  \"Hausnummer\": \"42\",\n  \"Mobilnummer\": \"01234567890\",\n  \"Festnetznummer\": \"0341 123456\",\n  \"email\": \"max@example.com\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/kunden", "host": ["{{baseUrl}}"], "path": ["api", "kunden"] }
+      }
+    },
+    {
+      "name": "Kunden - Update",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"Vorname\": \"Maximilian\",\n  \"Mobilnummer\": \"01701234567\"\n}" },
+        "url": { "raw": "{{baseUrl}}/api/kunden/{{kundeId}}", "host": ["{{baseUrl}}"], "path": ["api", "kunden", "{{kundeId}}"] }
+      }
+    },
+    {
+      "name": "Auth - Register",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"P@ssw0rd1\",\n  \"name\": \"Admin\"\n}" },
+        "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api", "auth", "register"] }
+      }
+    },
+    {
+      "name": "Auth - Login",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"P@ssw0rd1\"\n}" },
+        "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+      }
+    },
+    {
+      "name": "Auth - Get All Users (Admin)",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": { "raw": "{{baseUrl}}/api/auth/users", "host": ["{{baseUrl}}"], "path": ["api", "auth", "users"] }
+      }
+    },
+    {
+      "name": "Auth - Set User Role (Admin)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"role\": \"admin\"\n}" },
+        "url": { "raw": "{{baseUrl}}/api/auth/users/{{userId}}/role", "host": ["{{baseUrl}}"], "path": ["api", "auth", "users", "{{userId}}", "role"] }
+      }
+    },
+    {
+      "name": "Logs - Get All",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": { "raw": "{{baseUrl}}/api/logs", "host": ["{{baseUrl}}"], "path": ["api", "logs"] }
+      }
+    },
+    {
+      "name": "Logs - Get By Id",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": { "raw": "{{baseUrl}}/api/logs/{{zaehlernummer}}/{{datum}}", "host": ["{{baseUrl}}"], "path": ["api", "logs", "{{zaehlernummer}}", "{{datum}}"] }
+      }
+    },
+    {
+      "name": "Logs - Create",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"Zaehlernummer\": 123456,\n  \"Datum\": \"2025-11-14\",\n  \"Zaehlerstand\": 987\n}" },
+        "url": { "raw": "{{baseUrl}}/api/logs", "host": ["{{baseUrl}}"], "path": ["api", "logs"] }
+      }
+    },
+    {
+      "name": "Logs - Update",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"Zaehlerstand\": 200\n}" },
+        "url": { "raw": "{{baseUrl}}/api/logs/{{zaehlernummer}}/{{datum}}", "host": ["{{baseUrl}}"], "path": ["api", "logs", "{{zaehlernummer}}", "{{datum}}"] }
+      }
+    },
+    {
+      "name": "Logs - Delete",
+      "request": {
+        "method": "DELETE",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": { "raw": "{{baseUrl}}/api/logs/{{zaehlernummer}}/{{datum}}", "host": ["{{baseUrl}}"], "path": ["api", "logs", "{{zaehlernummer}}", "{{datum}}"] }
+      }
+    },
+    {
+      "name": "Devices - Get All",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": { "raw": "{{baseUrl}}/api/devices", "host": ["{{baseUrl}}"], "path": ["api", "devices"] }
+      }
+    },
+    {
+      "name": "Devices - Get By Id",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": { "raw": "{{baseUrl}}/api/devices/{{zaehlernummer}}", "host": ["{{baseUrl}}"], "path": ["api", "devices", "{{zaehlernummer}}"] }
+      }
+    },
+    {
+      "name": "Devices - Create",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"Zaehlernummer\": 123456,\n  \"Installationsdatum\": \"2025-11-14\",\n  \"KundenID\": 1\n}" },
+        "url": { "raw": "{{baseUrl}}/api/devices", "host": ["{{baseUrl}}"], "path": ["api", "devices"] }
+      }
+    },
+    {
+      "name": "Devices - Update",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"Installationsdatum\": \"2025-11-15\",\n  \"KundenID\": 2\n}" },
+        "url": { "raw": "{{baseUrl}}/api/devices/{{zaehlernummer}}", "host": ["{{baseUrl}}"], "path": ["api", "devices", "{{zaehlernummer}}"] }
+      }
+    },
+    {
+      "name": "Devices - Delete",
+      "request": {
+        "method": "DELETE",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": { "raw": "{{baseUrl}}/api/devices/{{zaehlernummer}}", "host": ["{{baseUrl}}"], "path": ["api", "devices", "{{zaehlernummer}}"] }
+      }
+    },
+    {
+      "name": "Import - Excel (multipart/form-data)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "file", "type": "file", "src": "" },
+            { "key": "type", "value": "kundendaten", "type": "text" }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/import?type=kundendaten",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "import"],
+          "query": [{ "key": "type", "value": "kundendaten" }]
+        }
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "token", "value": "" },
+    { "key": "userId", "value": "2" },
+    { "key": "zaehlernummer", "value": "123456" },
+    { "key": "datum", "value": "2025-11-14" },
+    { "key": "kundeId", "value": "1" }
+  ]
+}

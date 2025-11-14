@@ -9,17 +9,25 @@ export interface Kunde {
   // Primärschlüssel, optional bei Neuerstellung
   KundenID?: number;
 
-  // Persönliche Daten
-  name?: string;      // Name des Kunden
-  email?: string;     // E-Mail-Adresse (für Login)
+  // Persönliche Daten (basierend auf Kunden-Tabelle)
+  Vorname?: string;           // Vorname des Kunden
+  Nachname?: string;          // Nachname des Kunden
+  name?: string;              // Kombinierter Name (Vorname + Nachname)
+  email?: string;             // E-Mail-Adresse (für Login)
+  
+  // Adressdaten
+  Straße?: string;            // Straßenname (mit Umlaut aus DB)
+  Hausnummer?: string;        // Hausnummer
+  
+  // Kontaktdaten
+  Mobilnummer?: string;       // Mobiltelefonnummer
+  Festnetznummer?: string;    // Festnetznummer/Telefon
   
   // Sicherheit
-  password?: string;  // Gehashtes Passwort - NIE als Klartext speichern!
-  role?: string;      // Benutzerrolle (z.B. 'user', 'admin')
+  password?: string;          // Gehashtes Passwort - NIE als Klartext speichern!
+  role?: string;              // Benutzerrolle (z.B. 'user', 'admin', 'operator')
   
   // Weitere mögliche Felder
-  // telefon?: string;
-  // adresse?: string;
   // erstellt_am?: Date;
   // letzter_login?: Date;
 }

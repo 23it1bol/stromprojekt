@@ -33,9 +33,10 @@ router.use(auth);
 
 // CRUD Operationen für Logs/Verbrauchsdaten
 router.get('/', getLogs);
-router.get('/:id', getLogById);
+// Einzelner Log-Eintrag identifiziert durch Zaehlernummer + Datum
+router.get('/:zaehlernummer/:datum', getLogById);
 router.post('/', createLog);
-router.put('/:id', updateLog);
-router.delete('/:id', deleteLog);
+router.put('/:zaehlernummer/:datum', updateLog);
+router.delete('/:zaehlernummer/:datum', deleteLog);
 
 export default router;

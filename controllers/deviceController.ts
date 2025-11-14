@@ -32,7 +32,11 @@ import { Zaehler } from '../models/Zaehler';
  */
 export const getAllDevices = async (req: Request, res: Response) => {
   try {
-    const [devices] = await pool.query('SELECT * FROM zaehler');
+    const [devices] = await pool.query(
+      `SELECT z.Zaehlernummer, z.Installationsdatum, z.KundenID, k.Vorname, k.Nachname
+       FROM Zaehler z
+       LEFT JOIN Kunden k ON z.KundenID = k.KundenID`
+    );
     res.json(devices);
   } catch (error) {
     console.error(error);
@@ -43,16 +47,20 @@ export const getAllDevices = async (req: Request, res: Response) => {
 // Einen Zähler abrufen
 export const getDeviceById = async (req: Request, res: Response) => {
   try {
-    const [devices] = await pool.query(
-      'SELECT * FROM zaehler WHERE id = ?',
-      [req.params.id]
+    const zaehlernummer = req.params.zaehlernummer;
+    const [rows] = await pool.query(
+      `SELECT z.Zaehlernummer, z.Installationsdatum, z.KundenID, k.Vorname, k.Nachname
+       FROM Zaehler z
+       LEFT JOIN Kunden k ON z.KundenID = k.KundenID
+       WHERE z.Zaehlernummer = ?`,
+      [zaehlernummer]
     );
 
-    if ((devices as any[]).length === 0) {
+    if ((rows as any[]).length === 0) {
       return res.status(404).json({ message: 'Zähler nicht gefunden' });
     }
 
-    res.json((devices as any[])[0]);
+    res.json((rows as any[])[0]);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server Fehler' });
@@ -62,19 +70,18 @@ export const getDeviceById = async (req: Request, res: Response) => {
 // Neuen Zähler erstellen
 export const createDevice = async (req: Request, res: Response) => {
   try {
-    const { bezeichnung, typ, standort } = req.body;
-    
-    const [result] = await pool.query(
-      'INSERT INTO zaehler (bezeichnung, typ, standort) VALUES (?, ?, ?)',
-      [bezeichnung, typ, standort]
+    const { Zaehlernummer, Installationsdatum, KundenID } = req.body;
+
+    if (!Zaehlernummer || !Installationsdatum || !KundenID) {
+      return res.status(400).json({ message: 'Erforderliche Felder fehlen: Zaehlernummer, Installationsdatum, KundenID' });
+    }
+
+    await pool.query(
+      'INSERT INTO Zaehler (Zaehlernummer, Installationsdatum, KundenID) VALUES (?, ?, ?)',
+      [Zaehlernummer, Installationsdatum, KundenID]
     );
 
-    res.status(201).json({
-      id: (result as any).insertId,
-      bezeichnung,
-      typ,
-      standort
-    });
+    res.status(201).json({ Zaehlernummer, Installationsdatum, KundenID });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server Fehler' });
@@ -84,18 +91,29 @@ export const createDevice = async (req: Request, res: Response) => {
 // Zähler aktualisieren
 export const updateDevice = async (req: Request, res: Response) => {
   try {
-    const { bezeichnung, typ, standort } = req.body;
-    
-    const [result] = await pool.query(
-      'UPDATE zaehler SET bezeichnung = ?, typ = ?, standort = ? WHERE id = ?',
-      [bezeichnung, typ, standort, req.params.id]
-    );
+    const zaehlernummer = req.params.zaehlernummer;
+    const { Installationsdatum, KundenID } = req.body;
 
-    if ((result as any).affectedRows === 0) {
-      return res.status(404).json({ message: 'Zähler nicht gefunden' });
+    // Baue dynamisches Update
+    const fields: string[] = [];
+    const params: any[] = [];
+    if (Installationsdatum !== undefined) {
+      fields.push('Installationsdatum = ?');
+      params.push(Installationsdatum);
+    }
+    if (KundenID !== undefined) {
+      fields.push('KundenID = ?');
+      params.push(KundenID);
+    }
+    if (fields.length === 0) {
+      return res.status(400).json({ message: 'Keine Felder zum Aktualisieren' });
     }
 
-    res.json({ message: 'Zähler erfolgreich aktualisiert' });
+    params.push(zaehlernummer);
+    const query = `UPDATE Zaehler SET ${fields.join(', ')} WHERE Zaehlernummer = ?`;
+    const [result] = await pool.query(query, params);
+
+    res.json({ message: 'Zähler erfolgreich aktualisiert', affectedRows: (result as any).affectedRows });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server Fehler' });
@@ -105,10 +123,8 @@ export const updateDevice = async (req: Request, res: Response) => {
 // Zähler löschen
 export const deleteDevice = async (req: Request, res: Response) => {
   try {
-    const [result] = await pool.query(
-      'DELETE FROM zaehler WHERE id = ?',
-      [req.params.id]
-    );
+    const zaehlernummer = req.params.zaehlernummer;
+    const [result] = await pool.query('DELETE FROM Zaehler WHERE Zaehlernummer = ?', [zaehlernummer]);
 
     if ((result as any).affectedRows === 0) {
       return res.status(404).json({ message: 'Zähler nicht gefunden' });
@@ -117,6 +133,9 @@ export const deleteDevice = async (req: Request, res: Response) => {
     res.json({ message: 'Zähler erfolgreich gelöscht' });
   } catch (error) {
     console.error(error);
+    if (error instanceof Error && error.message.includes('FOREIGN KEY')) {
+      return res.status(409).json({ message: 'Zähler kann nicht gelöscht werden, da noch Verbrauchsdaten existieren' });
+    }
     res.status(500).json({ message: 'Server Fehler' });
   }
 };

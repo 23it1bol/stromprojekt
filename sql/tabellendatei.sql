@@ -34,25 +34,6 @@ CREATE TABLE Verbrauchsdaten (
     FOREIGN KEY (Zaehlernummer) REFERENCES Zaehler(Zaehlernummer)
 );
 
--- Anlagen-Tabelle
-CREATE TABLE Anlagen (
-    AnlageID INT PRIMARY KEY,
-    Name VARCHAR(100) NOT NULL,
-    Typ VARCHAR(50),
-    Inbetriebnahmedatum DATE,
-    Standort VARCHAR(100),
-    Status VARCHAR(50)  -- z. B. "aktiv", "wartung", "stillgelegt"
-);
-
--- Wartungen-Tabelle
-CREATE TABLE Wartungen (
-    WartungID INT PRIMARY KEY,
-    AnlageID INT NOT NULL,
-    Wartungsdatum DATE NOT NULL,
-    Beschreibung TEXT,
-    Wartungstyp VARCHAR(50), -- z. B. "geplant", "notfall", "automatisch"
-    FOREIGN KEY (AnlageID) REFERENCES Anlagen(AnlageID)
-);
 
 -- Users-Tabelle (für Auth / Login)
 CREATE TABLE IF NOT EXISTS users (
@@ -74,18 +55,16 @@ INSERT INTO `kunden`(`Vorname`, `Nachname`, `Straße`, `Hausnummer`, `Mobilnumme
 -- Beispiel-User (Passwort muss gesetzt werden bzw. gehasht eingesetzt werden)
 -- Hinweis: Passwort hier als Platzhalter; in der echten DB bitte einen bcrypt-Hash verwenden.
 INSERT INTO users (email, password, name, role) VALUES
-('admin@example.com', '$2a$10$REPLACE_WITH_BCRYPT_HASH', 'Administrator', 'admin');
+('admin@example.com', '$2a$10$fPO0bjv1bswpxZaeXH9R9OSC9XEsFW7tXnjNJ.Q62aLjzG8zuSH3a', 'Administrator', 'admin');
 
 -- -----------------------------
 -- DROP-Statements (sicheres Löschen in Abhängigkeitsreihenfolge)
 -- Deaktiviert Foreign Key Prüfungen kurz, löscht Tabellen und aktiviert sie wieder
--- Reihenfolge: Verbrauchsdaten -> Zaehler -> Wartungen -> Anlagen -> Kunden
+-- Reihenfolge: Verbrauchsdaten -> Zaehler -> Kunden
 -- -----------------------------
 SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS Verbrauchsdaten;
 DROP TABLE IF EXISTS Zaehler;
-DROP TABLE IF EXISTS Wartungen;
-DROP TABLE IF EXISTS Anlagen;
 DROP TABLE IF EXISTS Kunden;
 DROP TABLE IF EXISTS users;
 -- Audit_Log wird nur gelöscht, falls vorhanden

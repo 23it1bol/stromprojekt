@@ -6,23 +6,14 @@
  */
 
 export interface Zaehler {
-  // Primärschlüssel
-  id?: number;           // Auto-increment ID
-  
-  // Basis-Informationen
-  bezeichnung: string;   // Name/Bezeichnung des Zählers
-  typ: string;          // Art des Zählers (z.B. 'Strom', 'Gas', 'Wasser')
-  standort: string;     // Wo ist der Zähler installiert?
-  
-  // Technische Details
-  zaehlernummer?: string;  // Seriennummer/eindeutige Kennung
-  einheit?: string;        // Messeinheit (z.B. 'kWh', 'm³')
-  
-  // Verwaltung
-  installiert_am?: Date;   // Installationsdatum
-  aktiv: boolean;          // Ist der Zähler aktiv?
-  letzter_stand?: number;  // Letzter gemessener Stand
-  letzte_ablesung?: Date;  // Zeitpunkt der letzten Ablesung
+  // Primärschlüssel in DB: Zaehlernummer (INT)
+  Zaehlernummer: number;
+
+  // Installationsdatum (DATE)
+  Installationsdatum?: string | Date;
+
+  // Fremdschlüssel zum Kunden
+  KundenID?: number;
 }
 
 export default Zaehler;
