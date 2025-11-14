@@ -1,0 +1,118 @@
+NPM-BEFEHLE UND ABHÄNGIGKEITEN
+================================
+
+HÄUFIGE BEFEHLE
+--------------
+npm install     → Alle Abhängigkeiten installieren
+npm run dev     → Entwicklungsserver starten (mit TypeScript)
+npm run build   → TypeScript in JavaScript übersetzen
+npm run import  → Excel-Import über Kommandozeile starten
+npm run start   → Produktiv-Version starten (nach build)
+
+SKRIPTE IM DETAIL
+---------------
+"dev": "ts-node src/index.ts"
+  → Startet den Entwicklungsserver
+  → Verwendet ts-node, damit TypeScript direkt ausgeführt werden kann
+  → Automatisches Neuladen bei Änderungen
+
+"build": "tsc"
+  → Übersetzt TypeScript-Code in JavaScript
+  → Erstellt die Dateien im dist/-Ordner
+  → Wird vor dem produktiven Start ausgeführt
+
+"start": "node dist/index.js"
+  → Startet die kompilierte Version
+  → Für Produktivbetrieb gedacht
+  → Benötigt vorher npm run build
+
+"import": "ts-node scripts/importExcel.ts"
+  → Startet den Excel-Import über die Kommandozeile
+  → Alternative zum Web-Upload
+
+PRODUKTIONS-ABHÄNGIGKEITEN
+------------------------
+bcryptjs (^2.4.3)
+  → Für sicheres Passwort-Hashing
+  → Wird für Benutzer-Authentifizierung verwendet
+
+cors (^2.8.5)
+  → Ermöglicht Zugriff von anderen Domains/Ports
+  → Wichtig für Browser-basierte Clients
+  → Konfigurierbar für erlaubte Ursprünge
+
+dotenv (^16.0.3)
+  → Lädt Umgebungsvariablen aus .env Datei
+  → Z.B. Datenbank-Zugangsdaten, Port, JWT-Secret
+
+express (^4.18.2)
+  → Web-Framework für Node.js
+  → Routing, Middleware, HTTP-Server
+  → Basis der gesamten Anwendung
+
+express-validator (^7.0.1)
+  → Validierung von Eingabedaten
+  → Prüft z.B. Email-Formate, Pflichtfelder
+  → Verhindert ungültige Daten
+
+helmet (^7.1.0)
+  → Sicherheits-Middleware für Express
+  → Setzt wichtige HTTP-Header
+  → Schützt vor bekannten Schwachstellen
+
+jsonwebtoken (^9.0.2)
+  → Implementiert JWT für Authentifizierung
+  → Erstellt und prüft Tokens
+  → Schützt API-Endpunkte
+
+xlsx (^0.18.5)
+  → Liest und schreibt Excel-Dateien
+  → Verwendet für den Daten-Import
+  → Unterstützt verschiedene Excel-Formate
+
+multer (^1.4.5)
+  → Verarbeitet Datei-Uploads
+  → Speichert temporäre Dateien
+  → Wird für Excel-Upload verwendet
+
+ENTWICKLUNGS-ABHÄNGIGKEITEN
+-------------------------
+@types/*
+  → TypeScript-Definitionen für Bibliotheken
+  → Ermöglichen Code-Vervollständigung
+  → Fangen Fehler früh ab
+
+ts-node (^10.9.1)
+  → Führt TypeScript direkt aus
+  → Ohne separate Kompilierung
+  → Beschleunigt die Entwicklung
+
+typescript (^5.3.2)
+  → Der TypeScript-Compiler
+  → Übersetzt in JavaScript
+  → Prüft Typen und Syntax
+
+VERSIONSANGABEN ERKLÄRT
+---------------------
+^2.4.3 bedeutet:
+  2 = Major Version (große Änderungen)
+  4 = Minor Version (neue Features)
+  3 = Patch Version (Bugfixes)
+
+Das ^ erlaubt Updates der Minor und Patch Version,
+also z.B. von 2.4.3 auf 2.5.0, aber nicht auf 3.0.0.
+
+TIPPS
+----
+- Nach Änderungen an package.json: npm install ausführen
+- Bei TypeScript-Fehlern: npm run build zum Prüfen
+- Für Entwicklung: npm run dev (automatischer Reload)
+- Vor Produktiv-Start: npm run build && npm start
+- Bei Problemen: node_modules löschen und npm install
+
+DEBUGGING
+--------
+- Wenn der Server nicht startet: Port-Konflikte prüfen
+- TypeScript-Fehler: In der Konsole nach [TSxxxx] suchen
+- Fehlende Module: npm install nochmal ausführen
+- Seltsame Fehler: node_modules neu installieren

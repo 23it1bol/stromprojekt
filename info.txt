@@ -1,3 +1,5 @@
+-- Technische Referenz (original, detailliert)
+
 GET /api/kunden → Liste aller Kunden
 
 POST /api/kunden → Neuen Kunden anlegen
@@ -6,66 +8,113 @@ GET /api/rechnungen/:id → Einzelne Rechnung abrufen
 
 POST /api/anlage/:id/wartung → Wartung eintragen
 
-src -> source
+Projektstruktur (kurz)
+- `src/` = Quellcode (Server-Start, DB-Connector, Middleware)
+- `models/` = TypeScript-Interfaces für Datenstrukturen (z. B. `Kunde.ts`, `Zaehler.ts`, `Verbrauch.ts`)
+- `controllers/` = Logik pro Ressource (z. B. `kundenController.ts`)
+- `routes/` = Express-Router für Endpunkte (z. B. `routes/kunden.ts`)
+- `utils/` = Hilfsfunktionen (z. B. `auditLogger.ts`)
 
-Ordner models/
-Enthält Definitionen für die Datenstrukturen (Tabellen).
-Beispiel: Kunde.ts, Zaehler.ts, Verbrauch.ts
-Warum:
-Typen/Interfaces stellen sicher, dass die Daten korrekt verwendet werden
-Später kann man diese direkt für DB-Queries, Controller oder Validierungen verwenden
+Erläuterung wichtiger Dateien und Einstellungen
+- `tsconfig.json` (TypeScript-Konfiguration):
+	- `target: "ES2020"` → JavaScript-Zielversion
+	- `module: "CommonJS"` → Node.js-Module
+	- `outDir: "dist"` → Ausgabeverzeichnis nach Kompilierung
+	- `rootDir` → legt fest, wo der Quellcode liegt (Achtung: in diesem Projekt wurden einige Dateien außerhalb von `src/` belassen)
+	- `strict: true` → strikte Typprüfung
+- `src/db.ts` → MySQL-Pool (mysql2/promise). Hier kommen die DB-Verbindungsdaten per `.env`.
 
+Warum sind die Dateien so aufgeteilt?
+- `models/`: Beschreibt die Form der Daten (z. B. welche Felder ein Kunde hat). Das hilft, Fehler zu vermeiden.
+- `controllers/`: Enthält die Logik (z. B. wie ein Kunde erstellt oder gelesen wird). Trennt Logik von Technik.
+- `routes/`: Definiert die Internet‑Adressen (Endpunkte) wie `/api/kunden`.
+- `utils/`: Kleine Helfer (z. B. Audit-Logger), die überall wiederverwendet werden.
 
-Ordner controllers/
-Enthält die Logik für jede Ressource
-Beispiel: kundenController.ts
-Warum:
-Trennt “was passiert mit den Daten” von “wie die Daten empfangen werden”
-Hilft bei sauberem, prüfungsfreundlichem Aufbau
+DB & Fallback-Verhalten
+- Standard: Das Programm verbindet sich mit einer MySQL-Datenbank (Angaben in `.env`).
+- Fallback: Wenn die DB nicht erreichbar ist, nutzen die Controller einen temporären In‑Memory‑Speicher (`fallbackKunden`). Das ist nur für Entwicklung/Tests und verliert Daten bei einem Neustart.
 
-Ordner utils/
-Für Hilfsfunktionen, die in mehreren Dateien benutzt werden
-Beispiel: auditLogger.ts
-Warum:
-Code nicht mehrfach schreiben, sauber wiederverwenden
-Prüferfreundlich: du kannst klar erklären, Audit-Log ist zentral
+.env.example (Vorschlag)
+````plaintext
+TECHNISCHE REFERENZ (KURZ)
 
-src = alles, was programmiert wird
-models = Definitionen der Daten
-controllers = Logik, was mit den Daten passiert
-routes = REST-Endpunkte für Frontend/Client
-utils = Hilfsfunktionen wie Audit-Logger
-index.ts = Startpunkt des Servers
+Wichtige API-Endpunkte
+- GET  /api/kunden         → Liste aller Kunden
+- POST /api/kunden         → Neuen Kunden anlegen
+- POST /api/import?type=kundendaten
+  → Excel-Import (Web): Datei als form-data Feld `file` hochladen (geschützt, benötigt Login / Rolle operator|admin)
+- CLI-Import (Excel): `npm run import` (liest Datei in `scripts/` oder nutzt interaktiven Pfad)
 
-target: "ES2020" → sagt TypeScript, dass der Output JavaScript für die ES2020-Version sein soll.
+Projektstruktur (Kurz)
+- `src/`       → Server-Start, DB-Connector, Middleware
+- `routes/`    → Express-Router (z. B. `routes/kunden.ts`, `routes/import.ts`)
+- `controllers/`→ Logik pro Ressource (z. B. `controllers/kundenController.ts`)
+- `models/`    → TypeScript-Interfaces (Datenformen)
+- `utils/`     → Hilfsfunktionen (z. B. `auditLogger.ts`)
 
-module: "CommonJS" → Node.js verwendet CommonJS-Module (require/exports).
+DB & Fallback
+- Standard: MySQL-Datenbank (Konfiguration per `.env`).
+- Fallback: Falls DB nicht erreichbar, verwenden Controller einen temporären In‑Memory-Speicher (`fallbackKunden`) — nur für Entwicklung/Tests (Daten gehen beim Neustart verloren).
 
-moduleResolution: "node" → sagt TypeScript, wie es Module finden soll.
+.env.example (Kurz)
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=
+DB_DATABASE=stromprojekt
+PORT=3000
+USE_IN_MEMORY_DB=false
 
-outDir: "dist" → kompilierte JS-Dateien werden dort abgelegt, wenn du tsc ausführst.
+WIE STARTEN (SCHNELL)
+1) Abhängigkeiten installieren (im Projekt-Ordner):
+   ```powershell
+   npm install
+   ```
+2) Server starten (Dev):
+   ```powershell
+   npm run dev
+   ```
+   Ausgabe: Server läuft auf http://localhost:3000
 
-rootDir: "src" → Quellcode liegt im src/ Ordner.
+CLI-Excel-Import (lokal)
+- Mit dem CLI-Skript kannst du eine Excel-Datei importieren (falls du schon eine Datei im Projekt hast oder den Pfad im Skript angibst):
+  ```powershell
+  npm run import
+  ```
+  Das Skript verwendet die gemeinsame Import-Logik (`scripts/importerShared.ts`) und führt Deduplikation und Datenbank-Inserts durch.
 
-strict: true → strenge Typprüfung, gut für Anfänger, Fehler werden früher erkannt.
+Web-Import (Datei-Upload) — kurz
+- Endpoint: POST http://localhost:3000/api/import?type=kundendaten
+- Auth: Erfordert ein JWT (Authorization: Bearer <token>) eines Benutzers mit Rolle `operator` oder `admin`.
+- Field: form-data, Feldname `file` (Datei im .xlsx-Format)
+- Beispiel mit curl:
+  ```bash
+  curl -X POST "http://localhost:3000/api/import?type=kundendaten" \
+    -H "Authorization: Bearer <TOKEN>" \
+    -F "file=@C:/Pfad/zur/datei/kunden.xlsx"
+  ```
+- Beispiel mit PowerShell (Invoke-RestMethod unterstützt Multipart nicht direkt; benutze Postman oder curl unter Windows):
+  - Empfohlen: Postman oder curl zum Hochladen verwenden.
 
-esModuleInterop: true → erlaubt, Default-Importe wie import express from "express" zu nutzen, auch wenn das Original CommonJS ist.
+Nach dem Upload
+- Antwort: JSON { success: true, imported: <n>, messages: [ ... ] }
+- Temporäre Uploads werden in `tmp_uploads/` abgelegt und nach Verarbeitung gelöscht.
 
-import express from "express";
-→ Lädt das Express-Modul, um Webserver-Funktionen zu nutzen.
+AUTH / Benutzer (kurz)
+- Registrierung/Login: `/api/auth/register` und `/api/auth/login` (JSON body: email, password, name).
+- Zum Testen: wenn du einen Benutzer registrierst, hat dieser standardmäßig die Rolle `user`. Für Import musst du die Rolle auf `operator` oder `admin` setzen.
 
-const app = express();
-→ Erstellt eine Instanz des Express-Servers.
+Schneller Weg, Rolle zu setzen (MySQL):
+1) Melde dich in deiner Datenbank an (z. B. mit `mysql` oder Admin-Tool).
+2) Führe aus (ersetze email):
+   ```sql
+   UPDATE users SET role='operator' WHERE email='test@example.com';
+   ```
 
-const port = 3000;
-→ Port, auf dem der Server läuft. Standard ist oft 3000.
+Sicherheitshinweis
+- Der Import-Endpunkt ist geschützt — gib dein Token nicht weiter.
+- Passwörter werden im DB gehasht gespeichert (bcrypt).
 
-app.get("/test", (req, res) => res.send("OK"));
-→ Erstellt eine Route, also eine URL, die reagiert.
-
-/test → Pfad, den der Browser oder Postman aufruft
-
-(req, res) => res.send("OK") → Callback-Funktion, die "OK" zurückgibt
-
-app.listen(port, () => { console.log(...); });
-→ Startet den Server und zeigt in der Konsole an, dass er läuft.
+Für Lehrkräfte (sehr kurz & einfach)
+- Was ist das? → Ein kleiner Web‑Server, mit dem man Kunden eintragen und anzeigen kann.
+- Starten → `npm install` und `npm run dev` im Projekt-Ordner.
+- Importieren → Entweder per Datei am Server (CLI: `npm run import`) oder über die Webseite (POST /api/import), dafür braucht man ein Login mit Rolle `operator`.
