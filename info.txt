@@ -30,9 +30,9 @@ Warum sind die Dateien so aufgeteilt?
 - `routes/`: Definiert die Internet‑Adressen (Endpunkte) wie `/api/kunden`.
 - `utils/`: Kleine Helfer (z. B. Audit-Logger), die überall wiederverwendet werden.
 
-DB & Fallback-Verhalten
+DB-Verhalten
 - Standard: Das Programm verbindet sich mit einer MySQL-Datenbank (Angaben in `.env`).
-- Fallback: Wenn die DB nicht erreichbar ist, nutzen die Controller einen temporären In‑Memory‑Speicher (`fallbackKunden`). Das ist nur für Entwicklung/Tests und verliert Daten bei einem Neustart.
+- Hinweis: Es gibt keinen automatischen In‑Memory‑Fallback mehr. Fehler bei DB‑Verbindung werden als Fehler an die Endpunkte weitergereicht (HTTP 5xx).
 
 .env.example (Vorschlag)
 ````plaintext
@@ -52,9 +52,9 @@ Projektstruktur (Kurz)
 - `models/`    → TypeScript-Interfaces (Datenformen)
 - `utils/`     → Hilfsfunktionen (z. B. `auditLogger.ts`)
 
-DB & Fallback
+DB
 - Standard: MySQL-Datenbank (Konfiguration per `.env`).
-- Fallback: Falls DB nicht erreichbar, verwenden Controller einen temporären In‑Memory-Speicher (`fallbackKunden`) — nur für Entwicklung/Tests (Daten gehen beim Neustart verloren).
+- Achtung: Keine In-Memory-Fallbacks mehr; stelle sicher, dass die DB erreichbar ist.
 
 .env.example (Kurz)
 DB_HOST=localhost

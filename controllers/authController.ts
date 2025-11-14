@@ -19,6 +19,7 @@ import jwt from 'jsonwebtoken';
 import { validationResult } from 'express-validator';
 // pool: MySQL-Verbindungspool (aus src/db)
 import pool from '../src/db';
+import { logAudit } from '../utils/auditLogger';
 
 /**
  * Registrierung eines neuen Benutzers
@@ -42,6 +43,9 @@ export const register = async (req: Request, res: Response) => {
   try {
     const { email, password, name } = req.body;
 
+    // Standardrolle für neue Benutzer. Rolle darf nicht vom Client gesetzt werden.
+    const role = 'user';
+
     // Prüfe ob Benutzer bereits existiert
     const [existingUsers] = await pool.query(
       'SELECT * FROM users WHERE email = ?',
@@ -56,14 +60,15 @@ export const register = async (req: Request, res: Response) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Benutzer in DB speichern
+    // INSERT inkl. role
     const [result] = await pool.query(
-      'INSERT INTO users (email, password, name) VALUES (?, ?, ?)',
-      [email, hashedPassword, name]
+      'INSERT INTO users (email, password, name, role) VALUES (?, ?, ?, ?)',
+      [email, hashedPassword, name, role]
     );
 
-    // JWT Token generieren
+    // JWT Token generieren (mit der Rolle)
     const token = jwt.sign(
-      { id: (result as any).insertId, email, role: 'user' },
+      { id: (result as any).insertId, email, role },
       process.env.JWT_SECRET || 'dein-geheimer-schluessel',
       { expiresIn: '24h' }
     );
@@ -135,6 +140,40 @@ export const getAllUsers = async (req: Request, res: Response) => {
     res.json(users);
   } catch (error) {
     console.error(error);
+    res.status(500).json({ message: 'Server Fehler' });
+  }
+};
+
+// Admin-only: Setzt die Rolle eines Benutzers (z. B. 'admin' oder 'user')
+export const setUserRole = async (req: Request, res: Response) => {
+  try {
+    // auth-Middleware muss req.user befüllen
+    const requester = (req as any).user;
+    if (!requester || requester.role !== 'admin') {
+      return res.status(403).json({ message: 'Keine Berechtigung' });
+    }
+
+    const id = parseInt(req.params.id, 10);
+    const { role } = req.body;
+    const allowedRoles = ['admin', 'user', 'operator'];
+    if (isNaN(id) || !role || !allowedRoles.includes(role)) {
+      return res.status(400).json({ message: 'Ungültige Eingaben (erwarte role: admin|user|operator)' });
+    }
+
+    const [result] = await pool.query('UPDATE users SET role = ? WHERE id = ?', [role, id]);
+    const affected = (result as any).affectedRows as number;
+    if (affected === 0) return res.status(404).json({ message: 'Benutzer nicht gefunden' });
+
+    // Audit-Log schreiben
+    try {
+      logAudit('users', id, 'UPDATE_ROLE', requester.email || String(requester.id), `Rolle geändert zu ${role}`);
+    } catch (e) {
+      console.warn('Audit log failed:', e);
+    }
+
+    res.json({ message: 'Rolle aktualisiert', id, role });
+  } catch (error) {
+    console.error('Fehler beim Setzen der Rolle:', error);
     res.status(500).json({ message: 'Server Fehler' });
   }
 };

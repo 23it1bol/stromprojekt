@@ -11,7 +11,7 @@
 
 import { Router } from 'express';
 import { body, validationResult } from 'express-validator';
-import { login, register, getAllUsers } from '../controllers/authController';
+import { login, register, getAllUsers, setUserRole } from '../controllers/authController';
 import { auth } from '../middleware/auth';
 
 const router = Router();
@@ -60,5 +60,6 @@ const loginValidation = [
 router.post('/register', registerValidation, register);  // Neue Benutzer registrieren
 router.post('/login', loginValidation, login);          // Benutzer einloggen
 router.get('/users', auth, getAllUsers);                // Alle Benutzer auflisten (nur Admin)
+router.put('/users/:id/role', auth, setUserRole);     // Admin-only: Rolle setzen
 
 export default router;

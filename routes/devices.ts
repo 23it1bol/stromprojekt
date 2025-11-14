@@ -28,9 +28,10 @@ router.use(auth);
 
 // CRUD Operationen für Zähler/Geräte
 router.get('/', getAllDevices);
-router.get('/:id', getDeviceById);
+// Einzelner Zähler wird über seine Zaehlernummer identifiziert
+router.get('/:zaehlernummer', getDeviceById);
 router.post('/', createDevice);
-router.put('/:id', updateDevice);
-router.delete('/:id', deleteDevice);
+router.put('/:zaehlernummer', updateDevice);
+router.delete('/:zaehlernummer', deleteDevice);
 
 export default router;

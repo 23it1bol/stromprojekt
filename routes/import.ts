@@ -29,7 +29,8 @@ router.post('/', auth, upload.single('file'), async (req: any, res: Response) =>
 
     const importType = (req.query.type as string) || req.body.type || 'kundendaten';
     const filePath = req.file.path;
-    const workbook = xlsx.readFile(filePath);
+    // Lese die Excel-Datei; cellDates=true sorgt dafür, dass Datumszellen als JS Date zurückgegeben werden
+    const workbook = xlsx.readFile(filePath, { cellDates: true });
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
     const rows: any[] = xlsx.utils.sheet_to_json(sheet, { defval: null });
