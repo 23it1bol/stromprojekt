@@ -86,7 +86,7 @@ async function importKundendaten(rows: any[]) {
       // Deduplizierung-Strategie:
       // 1) Wenn Zaehlernummer vorhanden und bereits in Zaehler existiert -> skip (oder verknüpfen)
       // 2) Sonst: Suche Kunden über Mobilnummer
-      // 3) Fallback: Suche Kunden über Vorname+Nachname+Straße+Hausnummer
+      // 3) Alternative Suche: Kunden über Vorname+Nachname+Straße+Hausnummer
       // 4) Wenn kein Kunde gefunden: neuen Kunden anlegen
       // 5) Falls Zaehlernummer vorhanden: Zaehler mit der ermittelten KundenID anlegen
 
@@ -114,7 +114,7 @@ async function importKundendaten(rows: any[]) {
       }
 
       if (!kundenId) {
-        // Fallback: Suche per Name + Adresse
+        // Alternative Suche: Suche per Name + Adresse
         if (vorname || nachname || strasse || hausnummer) {
           const [nRows] = await pool.query(
             'SELECT KundenID FROM Kunden WHERE Vorname = ? AND Nachname = ? AND Straße = ? AND Hausnummer = ? LIMIT 1',
@@ -204,7 +204,7 @@ async function main() {
       const res = await importVerbrauchsdatenFromRows(rows);
       res.forEach(r => console.log(r));
     } else if (t === 'devices') {
-      // Legacy: fallback auf devices -> not implemented in this mapping
+      // Legacy: Geräte-Import ('devices') ist in dieser Version nicht unterstützt
       console.error("Der Import-Typ 'devices' ist in dieser Version nicht unterstützt. Verwende 'kundendaten' oder 'verbrauchsdaten'.");
     } else {
       console.error('Unbekannter Import-Typ:', importType, "(erwartet: 'kundendaten' oder 'verbrauchsdaten')");

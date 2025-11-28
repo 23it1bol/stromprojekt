@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
-// multer types might not be installed in the dev environment; use require and ensure tmp dir exists
+// Hinweis: In manchen Dev-Setups sind die Multer-Typen nicht installiert.
+// Wir verwenden daher `require` und unterdrücken die TS-Prüfung an dieser Stelle.
 // @ts-ignore
 const multer = require('multer');
 import xlsx from 'xlsx';
@@ -10,7 +11,7 @@ import { auth } from '../middleware/auth';
 
 const router = express.Router();
 
-// Multer Temp Storage
+// Temporäres Upload-Verzeichnis für Multer (wird nach Verarbeitung bereinigt)
 const tmpDir = path.join(process.cwd(), 'tmp_uploads');
 if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
 const upload = multer({ dest: tmpDir });
@@ -44,8 +45,8 @@ router.post('/', auth, upload.single('file'), async (req: any, res: Response) =>
       return res.status(400).json({ error: 'Unbekannter Import-Typ' });
     }
 
-    // cleanup temporary file
-    try { fs.unlinkSync(filePath); } catch (e) { /* ignore */ }
+    // Lösche die temporäre Upload-Datei
+    try { fs.unlinkSync(filePath); } catch (e) { /* Fehler beim Löschen ignorieren */ }
 
     res.json({ success: true, imported: result.length, messages: result });
   } catch (err) {

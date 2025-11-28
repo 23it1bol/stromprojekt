@@ -6,115 +6,45 @@ POST /api/kunden → Neuen Kunden anlegen
 
 GET /api/rechnungen/:id → Einzelne Rechnung abrufen
 
-POST /api/anlage/:id/wartung → Wartung eintragen
+Technische Kurzübersicht
 
-Projektstruktur (kurz)
-- `src/` = Quellcode (Server-Start, DB-Connector, Middleware)
-- `models/` = TypeScript-Interfaces für Datenstrukturen (z. B. `Kunde.ts`, `Zaehler.ts`, `Verbrauch.ts`)
-- `controllers/` = Logik pro Ressource (z. B. `kundenController.ts`)
-- `routes/` = Express-Router für Endpunkte (z. B. `routes/kunden.ts`)
-- `utils/` = Hilfsfunktionen (z. B. `auditLogger.ts`)
+Dieses Projekt ist ein kleines Node.js/Express API‑Backend (TypeScript). Es bietet grundlegende CRUD‑Funktionen für Kunden, Zähler und Verbrauchsdaten sowie einen Excel‑Import.
 
-Erläuterung wichtiger Dateien und Einstellungen
-- `tsconfig.json` (TypeScript-Konfiguration):
-	- `target: "ES2020"` → JavaScript-Zielversion
-	- `module: "CommonJS"` → Node.js-Module
-	- `outDir: "dist"` → Ausgabeverzeichnis nach Kompilierung
-	- `rootDir` → legt fest, wo der Quellcode liegt (Achtung: in diesem Projekt wurden einige Dateien außerhalb von `src/` belassen)
-	- `strict: true` → strikte Typprüfung
-- `src/db.ts` → MySQL-Pool (mysql2/promise). Hier kommen die DB-Verbindungsdaten per `.env`.
+Wichtige Endpunkte (Auswahl)
+- `POST /api/auth/register`  → Benutzer registrieren
+- `POST /api/auth/login`     → Login (bekommt JWT)
+- `GET  /api/kunden`         → Alle Kunden (auth erforderlich)
+- `POST /api/kunden`         → Neuen Kunden anlegen (auth erforderlich)
+- `PUT  /api/kunden/:id`     → Kunde aktualisieren (auth erforderlich)
+- `POST /api/import?type=kundendaten` → Excel‑Import (auth: operator|admin)
 
-Warum sind die Dateien so aufgeteilt?
-- `models/`: Beschreibt die Form der Daten (z. B. welche Felder ein Kunde hat). Das hilft, Fehler zu vermeiden.
-- `controllers/`: Enthält die Logik (z. B. wie ein Kunde erstellt oder gelesen wird). Trennt Logik von Technik.
-- `routes/`: Definiert die Internet‑Adressen (Endpunkte) wie `/api/kunden`.
-- `utils/`: Kleine Helfer (z. B. Audit-Logger), die überall wiederverwendet werden.
+Schnellstart
+1) Abhängigkeiten installieren:
+```powershell
+npm install
+```
+2) Entwicklungsserver starten:
+```powershell
+npm run dev
+```
 
-DB-Verhalten
-- Standard: Das Programm verbindet sich mit einer MySQL-Datenbank (Angaben in `.env`).
-- Hinweis: Es gibt keinen automatischen In‑Memory‑Fallback mehr. Fehler bei DB‑Verbindung werden als Fehler an die Endpunkte weitergereicht (HTTP 5xx).
-
-.env.example (Vorschlag)
-````plaintext
-TECHNISCHE REFERENZ (KURZ)
-
-Wichtige API-Endpunkte
-- GET  /api/kunden         → Liste aller Kunden
-- POST /api/kunden         → Neuen Kunden anlegen
-- POST /api/import?type=kundendaten
-  → Excel-Import (Web): Datei als form-data Feld `file` hochladen (geschützt, benötigt Login / Rolle operator|admin)
-- CLI-Import (Excel): `npm run import` (liest Datei in `scripts/` oder nutzt interaktiven Pfad)
-
-Projektstruktur (Kurz)
-- `src/`       → Server-Start, DB-Connector, Middleware
-- `routes/`    → Express-Router (z. B. `routes/kunden.ts`, `routes/import.ts`)
-- `controllers/`→ Logik pro Ressource (z. B. `controllers/kundenController.ts`)
-- `models/`    → TypeScript-Interfaces (Datenformen)
-- `utils/`     → Hilfsfunktionen (z. B. `auditLogger.ts`)
-
-DB
-- Standard: MySQL-Datenbank (Konfiguration per `.env`).
-- Achtung: Keine In-Memory-Fallbacks mehr; stelle sicher, dass die DB erreichbar ist.
-
-.env.example (Kurz)
+Konfiguration
+- Umgebungsvariablen in `.env` setzen (Beispielwerte):
+```
 DB_HOST=localhost
 DB_USER=root
 DB_PASSWORD=
 DB_DATABASE=stromprojekt
 PORT=3000
-USE_IN_MEMORY_DB=false
+JWT_SECRET=dein_geheimes_token
+```
 
-WIE STARTEN (SCHNELL)
-1) Abhängigkeiten installieren (im Projekt-Ordner):
-   ```powershell
-   npm install
-   ```
-2) Server starten (Dev):
-   ```powershell
-   npm run dev
-   ```
-   Ausgabe: Server läuft auf http://localhost:3000
+Import (kurz)
+- Web: `POST /api/import?type=kundendaten` mit `form-data` Feld `file` (xlsx). Benötigt JWT eines Benutzers mit Rolle `operator` oder `admin`.
+- CLI: `npm run import -- --file path/to/file.xlsx --type kundendaten`
 
-CLI-Excel-Import (lokal)
-- Mit dem CLI-Skript kannst du eine Excel-Datei importieren (falls du schon eine Datei im Projekt hast oder den Pfad im Skript angibst):
-  ```powershell
-  npm run import
-  ```
-  Das Skript verwendet die gemeinsame Import-Logik (`scripts/importerShared.ts`) und führt Deduplikation und Datenbank-Inserts durch.
+Weitere Hinweise
+- Uploads werden temporär in `tmp_uploads/` abgelegt und nach Verarbeitung gelöscht.
+- Passwörter werden mit `bcrypt` gehasht gespeichert.
 
-Web-Import (Datei-Upload) — kurz
-- Endpoint: POST http://localhost:3000/api/import?type=kundendaten
-- Auth: Erfordert ein JWT (Authorization: Bearer <token>) eines Benutzers mit Rolle `operator` oder `admin`.
-- Field: form-data, Feldname `file` (Datei im .xlsx-Format)
-- Beispiel mit curl:
-  ```bash
-  curl -X POST "http://localhost:3000/api/import?type=kundendaten" \
-    -H "Authorization: Bearer <TOKEN>" \
-    -F "file=@C:/Pfad/zur/datei/kunden.xlsx"
-  ```
-- Beispiel mit PowerShell (Invoke-RestMethod unterstützt Multipart nicht direkt; benutze Postman oder curl unter Windows):
-  - Empfohlen: Postman oder curl zum Hochladen verwenden.
-
-Nach dem Upload
-- Antwort: JSON { success: true, imported: <n>, messages: [ ... ] }
-- Temporäre Uploads werden in `tmp_uploads/` abgelegt und nach Verarbeitung gelöscht.
-
-AUTH / Benutzer (kurz)
-- Registrierung/Login: `/api/auth/register` und `/api/auth/login` (JSON body: email, password, name).
-- Zum Testen: wenn du einen Benutzer registrierst, hat dieser standardmäßig die Rolle `user`. Für Import musst du die Rolle auf `operator` oder `admin` setzen.
-
-Schneller Weg, Rolle zu setzen (MySQL):
-1) Melde dich in deiner Datenbank an (z. B. mit `mysql` oder Admin-Tool).
-2) Führe aus (ersetze email):
-   ```sql
-   UPDATE users SET role='operator' WHERE email='test@example.com';
-   ```
-
-Sicherheitshinweis
-- Der Import-Endpunkt ist geschützt — gib dein Token nicht weiter.
-- Passwörter werden im DB gehasht gespeichert (bcrypt).
-
-Für Lehrkräfte (sehr kurz & einfach)
-- Was ist das? → Ein kleiner Web‑Server, mit dem man Kunden eintragen und anzeigen kann.
-- Starten → `npm install` und `npm run dev` im Projekt-Ordner.
-- Importieren → Entweder per Datei am Server (CLI: `npm run import`) oder über die Webseite (POST /api/import), dafür braucht man ein Login mit Rolle `operator`.
+Wenn du eine noch kompaktere README wünschst (z. B. für GitHub), schreibe kurz "README" und ich erstelle sie.

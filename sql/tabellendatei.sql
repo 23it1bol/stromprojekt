@@ -2,7 +2,7 @@
 -- Datenbankstruktur für Stromkraftwerk
 -- Autor: Gabriel
 -- Erstellt: 26.09.25
--- Beschreibung: Kunden-, Zähler-, Verbrauchs- und Anlagendaten
+-- Beschreibung: Kunden-, Zähler- und Verbrauchsdaten
 -- ========================================
 
 -- Kunden-Tabelle

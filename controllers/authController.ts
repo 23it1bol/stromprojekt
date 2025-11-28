@@ -41,7 +41,10 @@ export const register = async (req: Request, res: Response) => {
   }
 
   try {
-    const { email, password, name } = req.body;
+    let { email, password, name } = req.body;
+    // Stelle sicher, dass Email vorhanden ist und normalisiere sie
+    if (!email) return res.status(400).json({ message: 'Email ist erforderlich' });
+    email = String(email).trim().toLowerCase();
 
     // Standardrolle für neue Benutzer. Rolle darf nicht vom Client gesetzt werden.
     const role = 'user';
@@ -91,7 +94,9 @@ export const login = async (req: Request, res: Response) => {
   }
 
   try {
-    const { email, password } = req.body;
+    let { email, password } = req.body;
+    if (!email) return res.status(400).json({ message: 'Email ist erforderlich' });
+    email = String(email).trim().toLowerCase();
 
     // Benutzer in DB suchen
     const [users] = await pool.query(

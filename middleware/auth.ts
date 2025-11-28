@@ -4,6 +4,10 @@
  * Diese Middleware prüft bei jeder Anfrage, ob ein gültiger JWT-Token vorhanden ist.
  * Sie wird verwendet, um geschützte Routen abzusichern.
  * 
+ * WICHTIG: Setze `JWT_SECRET` in deiner `.env`. Falls kein Secret gesetzt ist,
+ * verwendet die Middleware einen eingebetteten Default-Wert, der nur für lokale
+ * Entwicklung geeignet ist.
+ *
  * Funktionsweise:
  * 1. Token aus dem Authorization-Header extrahieren
  * 2. Token mit JWT-Secret verifizieren
